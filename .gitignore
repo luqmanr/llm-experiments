@@ -1,0 +1,10 @@
+.env
+env/
+
+results/
+mssql-data/
+**.pdf
+**.jpg
+**.jpeg
+**.png
+**.gif
