@@ -1,0 +1,8 @@
+#!/bin/bash
+docker run --rm -it \
+--name ocr \
+--network host \
+-v /home:/home \
+-w $(pwd) \
+--entrypoint /bin/bash \
+qimtronics/ocr:0.0.1-dev

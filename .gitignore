@@ -8,3 +8,6 @@ mssql-data/
 **.jpeg
 **.png
 **.gif
+output/
+.paddlex/
+*.*~

@@ -1,0 +1,17 @@
+mime_type: image/png
+uploading...
+Here's the extracted text from the image:
+
+*   **On the display:**
+    *   LITRES
+    *   26106 (This appears to be the main reading, with the '6' slightly cut off or implying a decimal, e.g., 2610.6, but based on the full number presentation, it's likely 26106 as the primary reading.)
+    *   Above "LITRES" there are some faint, possibly technical markings or units that are too blurry to fully decipher, but they look like small alphanumeric characters.
+
+*   **On the metal plate on the yellow machine component:**
+    *   H-10-1
+    *   788715
+    *   SG
+    *   0.84
+    *   [Faint/blurry text below SG and 0.84, possibly manufacturer or model info, but illegible.]
+    *   [Another line of faint text below that, also illegible.]
+    *   [Bottom line of text, very faint, possibly "DETROIT" or similar, but too blurry to be certain.]

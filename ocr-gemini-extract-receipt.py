@@ -24,8 +24,10 @@ POPPLER_PATH = None
 # PADDING CONFIGURATION
 # Normalized padding applied to all four sides of the bounding box. 
 # 10 units = 1% of the page dimension (width/height). 
-# A value of 20 here means 2% padding on all sides.
+# A value of 20 here means 2% padding on each side (20 units on a 0-1000 scale)
 PADDING_PERCENTAGE = 20 # Add 2% padding on each side (20 units on a 0-1000 scale)
+
+GENERATION_TEMPERATURE = 0.0
 
 # --- 2. JSON SCHEMA FOR LLM RESPONSE (FIXED) ---
 # This schema explicitly enforces the 3D structure: Pages -> Receipts -> Coordinates.
@@ -118,12 +120,15 @@ def get_bboxes_from_gemini(pdf_path):
             mime_type=mime_type
         )
 
-        # Define the prompt for structured extraction
+        # Define the prompt for structured extraction (Made more deterministic)
         ocr_prompt = """
-        Analyze the uploaded PDF document. Identify every distinct financial receipt, settlement report, or financial summary block on each page. 
-        For each identified block, provide its normalized bounding box coordinates [x_min, y_min, x_max, y_max], 
-        where coordinates are scaled from 0 to 1000 across the page width and height. 
-        Output the result as a single JSON object matching the provided schema exactly.
+        You are a highly deterministic document analysis bot. Your sole output must be a JSON object conforming exactly to the provided schema.
+
+        **Task Instructions for Bounding Box Generation:**
+        1. **Analyze Columns:** For each page of the PDF, first determine the vertical column structure used to lay out the financial receipts, reports, or summary blocks.
+        2. **Aggregate Vertically:** For each column identified, calculate a single, collective bounding box that spans the *entire* vertical range of all receipts/blocks within that column. This ensures that even if a column has multiple stacked receipts, they are treated as one large area. Each receipt will only have one receipt title. Receipt titles most likely are company names, such as "IndoKids, BCA, Mandiri, etc"
+        3. **Normalize Coordinates:** All coordinates ([x_min, y_min, x_max, y_max]) must be normalized to a scale of 0 to 1000, where 0,0 is the top-left corner and 1000,1000 is the bottom-right corner of the page.
+        4. **Strict Output:** Provide the coordinates in the JSON structure below. **Do not include any introductory text, reasoning, or additional comments outside of the final JSON.**
         """
         
         print("Sending PDF to Gemini for bounding box detection...")
@@ -132,7 +137,8 @@ def get_bboxes_from_gemini(pdf_path):
             contents=[pdf_part, ocr_prompt],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
-                response_schema=BOUNDING_BOX_SCHEMA
+                response_schema=BOUNDING_BOX_SCHEMA,
+                temperature=GENERATION_TEMPERATURE,
             )
         )
         

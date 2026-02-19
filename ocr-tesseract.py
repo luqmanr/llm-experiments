@@ -3,7 +3,7 @@ import pytesseract
 from pdf2image import convert_from_path
 from PIL import Image
 
-pytesseract.pytesseract.tesseract_cmd = '/home/luqmanr/bin/tesseract'
+# pytesseract.pytesseract.tesseract_cmd = '/home/luqmanr/bin/tesseract'
 
 def ocr_pdf_page_by_page_pdf2image(pdf_path, poppler_path=None):
     if not os.path.exists(pdf_path):
@@ -43,7 +43,9 @@ def extract_text_from_image(image_path):
     try:
         img = Image.open(image_path)
         # Note: AppImages often include the necessarequires it.
-        text = pytesseract.image_to_string(img)
+        img_new = resize_image_for_ocr(img, scale_factor=2)
+        psm_config = r'--psm 6'
+        text = pytesseract.image_to_string(img_new, config=psm_config)
         return text
 
     except pytesseract.TesseractNotFoundError:
@@ -55,9 +57,25 @@ def extract_text_from_image(image_path):
         return "Error: Tesseract is not found. Check the path set in 'pytesseract.pytesseract.tesseract_cmd'."
     except Exception as e:
         return f"An unexpected error occurred: {e}"
+    
+def resize_image_for_ocr(input_image, scale_factor=2):
+    
+    # Calculate new dimensions
+    new_width = int(input_image.width * scale_factor)
+    new_height = int(input_image.height * scale_factor)
+    
+    # Resize using Image.LANCZOS for highest quality upscaling
+    resized_img = input_image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    
+    return resized_img
 
 if __name__ == "__main__":
-    image_file = '22102025 ATP.png' 
+    # image_file = '22102025 ATP.png' 
+    image_file = 'flowmeter-1-large.png'
+    if not os.path.exists(image_file):
+        print(f"Error: Image file '{image_file}' not found.")
+        import sys
+        sys.exit(1)
     print(f"--- Starting OCR for image: {image_file} ---")
     extracted_text = extract_text_from_image(image_file)
     
